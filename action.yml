@@ -4,16 +4,16 @@ description: 'Action to notarize (xcrun notarytool) and staple (xcrun stapler) a
 
 inputs:
   product_path:
-    description: 'Path of the software to notarize (Support .app, .dmg and .pkg)'
+    description: 'Path of the software to notarize (Supports .app, .dmg, .zip, and .pkg)'
     requires: true
-  apple_id:
-    description: 'notarytool --apple-id parameter (Developer Apple ID)'
+  key:
+    description: 'notarytool -k parameter (Path to .p8 file of API key)'
     required: true
-  password:
-    description: 'notarytool --password parameter (App-specific password for your Apple ID)'
+  key_id:
+    description: 'notarytool -d parameter (API Key ID)'
     required: true
-  team_id:
-    description: 'notarytool --team-id parameter (Developer Team ID)'
+  issuer:
+    description: 'notarytool -i parameter (API Key Issuer)'
     required: true
   keychain_profile:
     description: 'notarytool --keychain-profile parameter'
@@ -44,7 +44,7 @@ runs:
         security set-keychain-settings -lut 900 ${KEYCHAIN_PATH}
         security unlock-keychain -p "${KEYCHAIN_PASS}" ${KEYCHAIN_PATH}
         # import credentials from secrets
-        xcrun notarytool store-credentials "${{ inputs.keychain_profile }}" --apple-id "${{ inputs.apple_id }}" --password "${{ inputs.password }}" --team-id "${{ inputs.team_id }}" --keychain "${KEYCHAIN_PATH}"
+        xcrun notarytool store-credentials "${{ inputs.keychain_profile }}" -k "${{ inputs.key }}" -d "${{ inputs.key_id }}" -i "${{ inputs.issuer }}" --keychain "${KEYCHAIN_PATH}"
       shell: bash
 
     - name: Notarize ${{ inputs.product_path }}
